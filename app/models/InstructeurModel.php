@@ -84,4 +84,27 @@ class InstructeurModel
         $this->db->query($sql);
         return   $this->db->resultSet();
     }
+    public function getUnassignedVehicles()
+    {
+        $sql = "SELECT TypeVoertuig.TypeVoertuig, Type, Voertuig.Id as Id, Voertuig.Kenteken, Voertuig.Bouwjaar, Voertuig.Brandstof, TypeVoertuig.Rijbewijscategorie
+        FROM Voertuig
+        LEFT JOIN VoertuigInstructeur ON Voertuig.Id = VoertuigInstructeur.VoertuigId
+        LEFT JOIN TypeVoertuig ON Voertuig.TypeVoertuigId = TypeVoertuig.Id
+        WHERE VoertuigInstructeur.Id IS NULL;
+        ";
+
+        $this->db->query($sql);
+
+        return $this->db->resultSet();
+    }
+
+    public function assignVehicleToInstructor($instructeurId, $vehicleId)
+    {
+        $sql = "INSERT INTO VoertuigInstructeur (VoertuigId, InstructeurId, DatumToekening, DatumAangemaakt, DatumGewijzigd)
+        VALUES ($vehicleId, $instructeurId, CURRENT_DATE, CURRENT_DATE, CURRENT_DATE);";
+
+        $this->db->query($sql);
+
+        return $this->db->resultSet();
+    }
 }

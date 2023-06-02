@@ -130,4 +130,60 @@ class Instructeur extends BaseController
         ];
         $this->view('Instructeur/gebruikteVoertuigen', $data);
     }
+    // //////////////////////////////////////////////////////////////////////////////////////
+    // OPdracht 2
+    public function toevoegen($instructeurId)
+    {
+
+        // Haal de info van de instructeur op uit de database (model)
+
+        $instructeur = $this->instructeurModel->getInstructeurInfoById($instructeurId);
+
+        // var_dump($instructeur);
+
+        //opgalen toegewezen voerthuigen
+        $unAssignedVehicles = $this->instructeurModel->getUnassignedVehicles($instructeurId);
+
+        // var_dump($unAssignedVehicles);       // $aantalSterren = sizeof($);
+
+        $tableRows = "";
+
+        foreach ($unAssignedVehicles as $vehicles) {
+            $tableRows .= "<tr>
+                                <td>$vehicles->TypeVoertuig</td>
+                                <td>$vehicles->Type</td>
+                                <td>$vehicles->Kenteken</td>
+                                <td>$vehicles->Bouwjaar</td>
+                                <td>$vehicles->Brandstof</td>
+                                <td>$vehicles->Rijbewijscategorie</td>
+                                <td>
+                                <a href='" . URLROOT . "/Instructeur/koppelen/$instructeurId/$vehicles->Id'>Voeg toe</a>
+                                </td>
+                            </tr>";
+        }
+
+
+        $data = [
+            'title'         => 'Door instructeur gebruikte voertuigen',
+            'voornaam'      => $instructeur->Voornaam,
+            'tussenvoegsel' => $instructeur->Tussenvoegsel,
+            'achternaam'    => $instructeur->Achternaam,
+            'datumInDienst'    => $instructeur->DatumInDienst,
+            'aantalSterren' => $instructeur->Aantalsterren,
+            'tableRows' => $tableRows,
+            'instructeurId' => $instructeurId
+        ];
+        $this->view('Instructeur/toevoegen', $data);
+    }
+
+    public function koppelen($instructeurId, $vehicleId)
+    {
+        // var_dump($instructeurId, $vehicleId);
+
+        $this->instructeurModel->assignVehicleToInstructor($instructeurId, $vehicleId);
+
+        header("Refresh: 3; url=/Instructeur/toevoegen/$instructeurId");
+
+        echo "Gelukt!";
+    }
 }
